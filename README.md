@@ -92,7 +92,7 @@ For example, use this docker image to deploy a **Laravel 9** project.
 Dockerfile:
 
 ```dockerfile
-FROM tangramor/nginx-php8-fpm
+FROM tangramor/nginx-php8-fpm-node
 
 # copy source code
 COPY . /var/www/html
@@ -153,7 +153,7 @@ Make sure you have correct environment parameters set:
 version: '3'
 services:
     laravel.test:
-        image: tangramor/nginx-php8-fpm
+        image: tangramor/nginx-php8-fpm-node
         environment:
             TZ: 'Europe/Moscow'
             WEBROOT: '/var/www/html/public'
