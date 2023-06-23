@@ -3,7 +3,8 @@
 Based on php:8.2.7-fpm-alpine3.18, node:20.3.1-alpine3.18 (nodejs is not included in most of other nginx-php images...but needed by a lot of php frameworks), with nginx:alpine and richarvey/nginx-php-fpm's Docker script
 
 **Tags:**
-* latest, php8.2.7_node20.3.1, php8.2.7_withoutNodejs (2023-06-23 alpine3.18)
+* nginx-php8-fpm: latest, php8.2.7 (2023-06-23 alpine3.18)
+* nginx-php8-fpm-node: latest, php8.2.7 (2023-06-23 alpine3.18)
 
 **NOTE** If you are upgrading from PHP **8.0 to 8.1** or from **8.1 to 8.2**, you may need to run `composer update` to upgrade php packages, because some packages under 8.0/8.1 are not supported in 8.1/8.2
 
