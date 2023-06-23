@@ -1,45 +1,24 @@
 # Nginx + php-fpm (v8) + nodejs
 
-Based on php:8.2.6-fpm-alpine3.17, node:20.2.0-alpine3.17 (nodejs is not included in most of other nginx-php images...but needed by a lot of php frameworks), with nginx:alpine and richarvey/nginx-php-fpm's Docker script
-
-* Since `php8.1.8_node18.4.0`, PHP `amqp` module is added.
-* Since `php8.1.10_node18.8.0`, PHP `swoole` module is added.
-* Since `php8.1.12`, added `_withoutNodejs` build for some pure PHP API frameworks like [Lumen](https://lumen.laravel.com)
+Based on php:8.2.7-fpm-alpine3.18, node:20.3.1-alpine3.18 (nodejs is not included in most of other nginx-php images...but needed by a lot of php frameworks), with nginx:alpine and richarvey/nginx-php-fpm's Docker script
 
 **Tags:**
-* latest, php8.2.6_node20.2.0, php8.2.6_withoutNodejs (2023-06-07 alpine3.17)
-* php8.2.5_node20.1.0, php8.2.5_withoutNodejs (2023-05-08 alpine3.17)
-* php8.2.4_node19.8.1, php8.2.4_withoutNodejs (2023-04-10 alpine3.17)
-* php8.2.3_node19.7.0, php8.2.3_withoutNodejs (2023-03-06 alpine3.17)
-* php8.2.2_node19.6.0, php8.2.2_withoutNodejs (2023-02-06 alpine3.17)
-* php8.2.0_node19.3.0, php8.2.0_withoutNodejs (2023-01-05 alpine3.17) **Note: PHP version is 8.2 now!**
-* php8.1.13_node19.2.0, php8.1.13_withoutNodejs (2022-12-06 alpine3.16)
-* php8.1.12_node19.0.0, php8.1.12_withoutNodejs (2022-11-07 alpine3.16)
-* php8.1.11_node18.10.0 (2022-10-13 alpine3.16)
-* php8.1.10_node18.8.0 (2022-09-06 alpine3.16)
-* php8.1.9_node18.7.0 (2022-08-11 alpine3.16)
-* php8.1.8_node18.4.0 (2022-07-08 alpine3.16)
-* php8.1.6_node18.2.0 (2022-06-06 alpine3.15)
-* php8.1.5_node18.1.0 (2022-05-07)
-* php8.1.4_node17.8 (2022-04-10)
-* php8.1.3_node17 (2022-03-07)
-* php8.0.13_node17 (2022-03-07)
-* php8_node15 (2022-03-07)
+* latest, php8.2.7_node20.3.1, php8.2.7_withoutNodejs (2023-06-23 alpine3.18)
 
 **NOTE** If you are upgrading from PHP **8.0 to 8.1** or from **8.1 to 8.2**, you may need to run `composer update` to upgrade php packages, because some packages under 8.0/8.1 are not supported in 8.1/8.2
 
 ```
 # php -v
-PHP 8.2.6 (cli) (built: May 11 2023 20:29:17) (NTS)
+PHP 8.2.7 (cli) (built: Jun 15 2023 01:00:47) (NTS)
 Copyright (c) The PHP Group
-Zend Engine v4.2.6, Copyright (c) Zend Technologies
-    with Zend OPcache v8.2.6, Copyright (c), by Zend Technologies
+Zend Engine v4.2.7, Copyright (c) Zend Technologies
+    with Zend OPcache v8.2.7, Copyright (c), by Zend Technologies
 
 # node -v
-v20.2.0
+v20.3.1
 
 # nginx -v
-nginx version: nginx/1.25.0
+nginx version: nginx/1.25.1
 ```
 
 ## PHP Modules
@@ -49,7 +28,6 @@ In this image it contains following PHP modules:
 ```
 # php -m
 [PHP Modules]
-amqp
 bcmath
 Core
 ctype
@@ -66,7 +44,6 @@ igbinary
 imap
 intl
 json
-ldap
 libxml
 mbstring
 memcached
@@ -127,16 +104,8 @@ COPY . /var/www/html
 # copy ssl cert files
 COPY conf/ssl /etc/nginx/ssl
 
-# China alpine mirror: mirrors.ustc.edu.cn
-ARG APKMIRROR=""
-
 # start.sh will set desired timezone with $TZ
-ENV TZ Asia/Shanghai
-
-# China php composer mirror: https://mirrors.cloud.tencent.com/composer/
-ENV COMPOSERMIRROR=""
-# China npm mirror: https://registry.npmmirror.com
-ENV NPMMIRROR=""
+ENV TZ Europe/Moscow
 
 # start.sh will replace default web root from /var/www/html to $WEBROOT
 ENV WEBROOT /var/www/html/public
@@ -149,17 +118,13 @@ ENV CREATE_LARAVEL_STORAGE "1"
 
 # download required node/php packages, 
 # some node modules need gcc/g++ to build
-RUN if [[ "$APKMIRROR" != "" ]]; then sed -i "s/dl-cdn.alpinelinux.org/${APKMIRROR}/g" /etc/apk/repositories ; fi\
-    && apk add --no-cache --virtual .build-deps gcc g++ libc-dev make \
+RUN && apk add --no-cache --virtual .build-deps gcc g++ libc-dev make \
     # set preferred npm mirror
     && cd /usr/local \
-    && if [[ "$NPMMIRROR" != "" ]]; then npm config set registry ${NPMMIRROR}; fi \
-    && npm config set registry $NPMMIRROR \
     && cd /var/www/html \
     # install node modules
     && npm install \
     # install php composer packages
-    && if [[ "$COMPOSERMIRROR" != "" ]]; then composer config -g repos.packagist composer ${COMPOSERMIRROR}; fi \
     && composer install \
     # clean
     && apk del .build-deps \
@@ -171,7 +136,7 @@ RUN if [[ "$APKMIRROR" != "" ]]; then sed -i "s/dl-cdn.alpinelinux.org/${APKMIRR
     && chown -Rf nginx.nginx /var/www/html
 ```
 
-You may check [start.sh](https://github.com/tangramor/nginx-php8-fpm/blob/master/start.sh) for more information about what it can do.
+You may check [start.sh](https://github.com/coralhl/nginx-php8-fpm/blob/master/start.sh) for more information about what it can do.
 
 
 ### Develop with this image
@@ -189,12 +154,10 @@ services:
     laravel.test:
         image: tangramor/nginx-php8-fpm
         environment:
-            TZ: 'Asia/Shanghai'
+            TZ: 'Europe/Moscow'
             WEBROOT: '/var/www/html/public'
             PHP_REDIS_SESSION_HOST: 'redis'
             CREATE_LARAVEL_STORAGE: '1'
-            COMPOSERMIRROR: 'https://mirrors.cloud.tencent.com/composer/'
-            NPMMIRROR: 'https://registry.npmmirror.com'
         ports:
             - '${APP_PORT:-80}:80'
         extra_hosts:
