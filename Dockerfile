@@ -2,6 +2,7 @@ FROM php:8.2.7-fpm-alpine3.18
 
 LABEL org.opencontainers.image.authors="coral (coralhl@gmail.com)"
 LABEL org.opencontainers.image.url="https://www.github.com/coralhl/nginx-php8-fpm"
+LABEL org.opencontainers.image.source="https://www.github.com/coralhl/nginx-php8-fpm"
 
 USER root
 
