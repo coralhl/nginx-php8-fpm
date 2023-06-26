@@ -92,7 +92,7 @@ For example, use this docker image to deploy a **Laravel 9** project.
 Dockerfile:
 
 ```dockerfile
-FROM tangramor/nginx-php8-fpm-node
+FROM coralhl/nginx-php8-fpm-node
 
 # copy source code
 COPY . /var/www/html
@@ -153,7 +153,7 @@ Make sure you have correct environment parameters set:
 version: '3'
 services:
     laravel.test:
-        image: tangramor/nginx-php8-fpm-node
+        image: coralhl/nginx-php8-fpm-node
         environment:
             TZ: 'Europe/Moscow'
             WEBROOT: '/var/www/html/public'
@@ -247,7 +247,7 @@ You may use this image as the base image to build your own. For example, to add 
 - Create a `Dockerfile`
 
 ```dockerfile
-FROM tangramor/nginx-php8-fpm
+FROM coralhl/nginx-php8-fpm
 
 RUN apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS \
     && apk add --no-cache --update --virtual .all-deps $PHP_MODULE_DEPS \
