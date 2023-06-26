@@ -140,10 +140,10 @@ RUN set -x \
 # variables
     && apk add --no-cache tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache curl ca-certificates \
+    && apk add --no-cache curl ca-certificates
 # forward request and error logs to docker log collector
-    && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
+#    && ln -sf /dev/stdout /var/log/nginx/access.log \
+#    && ln -sf /dev/stderr /var/log/nginx/error.log
 
 ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf
 ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
