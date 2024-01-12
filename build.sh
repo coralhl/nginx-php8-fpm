@@ -2,5 +2,7 @@
 
 docker build \
     -f Dockerfile \
-    -t ghcr.io/coralhl/nginx-php8-fpm:php8.2.7 \
+    -t coralhl/nginx-php8-fpm:php8.2.13 \
+    -t coralhl/nginx-php8-fpm:latest \
+    -t ghcr.io/coralhl/nginx-php8-fpm:php8.2.13 \
     -t ghcr.io/coralhl/nginx-php8-fpm:latest .

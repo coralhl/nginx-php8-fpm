@@ -1,4 +1,4 @@
-FROM php:8.2.7-fpm-alpine3.18
+FROM php:8.2.13-fpm-alpine3.19
 
 LABEL org.opencontainers.image.authors="coral (coralhl@gmail.com)"
 LABEL org.opencontainers.image.url="https://www.github.com/coralhl/nginx-php8-fpm"
@@ -9,54 +9,20 @@ USER root
 WORKDIR /var/www/html
 
 ENV TZ=Europe/Moscow
-
-COPY conf/supervisord.conf /etc/supervisord.conf
-COPY conf/php-fpm.conf /etc/supervisor/conf.d/php-fpm.conf
-COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/default.conf /etc/nginx/conf.d/default.conf
-# COPY conf/resolv.conf /etc/resolv.conf
-
-COPY start.sh /start.sh
-
-ENV PHP_MODULE_DEPS gcc make libc-dev zlib-dev libmemcached-dev cyrus-sasl-dev libpng-dev libxml2-dev curl-dev icu-dev libzip-dev imap-dev postgresql-dev
-# ENV MUSL_LOCALE_DEPS cmake make musl-dev gcc gettext-dev libintl 
-# ENV MUSL_LOCPATH /usr/share/i18n/locales/musl
-
-ENV NGINX_VERSION 1.25.1
-ENV NJS_VERSION   0.7.12
+#ENV LANG ru_RU.UTF-8
+#ENV LANGUAGE ru_RU.UTF-8
+#ENV LC_ALL ru_RU.UTF-8
+ENV NGINX_VERSION 1.25.3
 ENV PKG_RELEASE   1
 
 RUN set -x \
     && apk update \
-# add utf-8 locale support
-    # && apk add --no-cache $MUSL_LOCALE_DEPS \
-    # && wget https://gitlab.com/rilian-la-te/musl-locales/-/archive/master/musl-locales-master.zip \
-    # && unzip musl-locales-master.zip \
-    # && cd musl-locales-master \
-    # && cmake -DLOCALE_PROFILE=OFF -D CMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install \
-    # && cd .. && rm -rf musl-locales-master* \
-# add locale support by glibc
-    # && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
-    # && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-2.35-r0.apk \
-    # && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-bin-2.35-r0.apk \
-    # && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-i18n-2.35-r0.apk \
-    # && apk add --allow-untrusted glibc-2.35-r0.apk glibc-bin-2.35-r0.apk glibc-i18n-2.35-r0.apk \
-    # && /usr/glibc-compat/bin/localedef -i en_US -f UTF-8 en_US.UTF-8 \
-    # && rm -f *.apk \
-    # && echo "export PATH=/usr/glibc-compat/bin:$PATH" >> ~/.bashrc \
-# set default locale
-    # && echo "export LANG=en_US.UTF-8" >> ~/.bashrc \
-    # && echo "export LC_ALL=en_US.UTF-8" >> ~/.bashrc \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
     && apkArch="$(cat /etc/apk/arch)" \
     && nginxPackages=" \
         nginx=${NGINX_VERSION}-r${PKG_RELEASE} \
         nginx-module-xslt=${NGINX_VERSION}-r${PKG_RELEASE} \
         nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
         nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
-        nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
     " \
     && case "$apkArch" in \
         x86_64|aarch64) \
@@ -83,22 +49,22 @@ RUN set -x \
             && tempDir="$(mktemp -d)" \
             && chown nobody:nobody $tempDir \
             && apk add --no-cache --virtual .build-deps \
+                alpine-sdk \
+                bash \
+                findutils \
                 gcc \
-                libc-dev \
-                make \
-                openssl-dev \
-                pcre-dev \
-                zlib-dev \
-                linux-headers \
-                libxslt-dev \
                 gd-dev \
                 geoip-dev \
-                perl-dev \
+                libc-dev \
                 libedit-dev \
+                libxslt-dev \
+                linux-headers \
+                make \
                 mercurial \
-                bash \
-                alpine-sdk \
-                findutils \
+                openssl-dev \
+                pcre-dev \
+                perl-dev \
+                zlib-dev \
             && su nobody -s /bin/sh -c " \
                 export HOME=${tempDir} \
                 && cd ${tempDir} \
@@ -138,19 +104,110 @@ RUN set -x \
     && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache tzdata \
+    && apk add --no-cache tzdata musl musl-utils musl-locales \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
     && apk add --no-cache curl ca-certificates
-# forward request and error logs to docker log collector
-#    && ln -sf /dev/stdout /var/log/nginx/access.log \
-#    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+RUN curl http://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
+    && apk add --no-cache \
+        bash \
+        bash-completion \
+        c-client \
+        coreutils \
+        git \
+        icu \
+        icu-libs \
+        icu-data-full \
+        imap \
+        libmemcached-libs \
+        libcap \
+        libpng \
+        libstdc++ \
+        libzip \
+        linux-headers \
+        lua-resty-core \
+        mysql-client \
+        nginx-mod-http-lua \
+        postgresql-client \
+        postgresql-libs \
+        shadow \
+        sqlite \
+        supervisor \
+        unzip \
+        zip \
+        # bitrix utils
+        gifsicle \
+        jpegoptim \
+        libwebp-tools \
+        optipng
+
+ENV PHP_MODULE_DEPS \
+        curl-dev \
+        cyrus-sasl-dev \
+        freetype-dev \
+        gcc \
+        icu-dev \
+        imap-dev \
+        jpeg-dev \
+        libc-dev \
+        libjpeg-turbo-dev \
+        libmemcached-dev \
+        libpng-dev \
+        libwebp-dev \
+        libxml2-dev \
+        libzip-dev \
+        make \
+        postgresql-dev \
+        zlib-dev 
+
+RUN set -xe \
+    && apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS \
+    && apk add --no-cache --update --virtual .all-deps $PHP_MODULE_DEPS \
+    && docker-php-ext-configure \
+        gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
+        bcmath \
+        dom \
+        exif \
+        gd \
+        imap \
+        intl \
+        mysqli \
+        opcache \
+        pcntl \
+        pdo \
+        pdo_mysql \
+        pdo_pgsql \
+        pgsql \
+        soap \
+        sockets \
+        zip \
+    && pecl install igbinary && docker-php-ext-enable igbinary \
+    && pecl install memcache && docker-php-ext-enable memcache \
+    && pecl install memcached && docker-php-ext-enable memcached \
+    && pecl install msgpack && docker-php-ext-enable msgpack \
+    && pecl install -o -f redis && docker-php-ext-enable redis \
+    && docker-php-ext-enable sockets \
+    # && pecl install swoole && docker-php-ext-enable swoole \
+    && rm -rf /tmp/pear \
+    && apk del .all-deps .phpize-deps \
+    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/* \
+    && rm -f /etc/nginx/conf.d/default.conf.apk-new && rm -f /etc/nginx/nginx.conf.apk-new
+
+COPY conf/supervisord.conf /etc/supervisord.conf
+COPY conf/php-fpm.conf /etc/supervisor/conf.d/php-fpm.conf
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
+# COPY conf/resolv.conf /etc/resolv.conf
+COPY start.sh /start.sh
+COPY conf/lsiown /usr/bin/lsiown
 
 ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf
 ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
 
-RUN echo "cgi.fix_pathinfo=0" > ${php_vars} &&\
-    echo "upload_max_filesize = 100M"  >> ${php_vars} &&\
-    echo "post_max_size = 100M"  >> ${php_vars} &&\
+RUN echo "cgi.fix_pathinfo=0" > ${php_vars} && \
+    echo "upload_max_filesize = 100M"  >> ${php_vars} && \
+    echo "post_max_size = 100M"  >> ${php_vars} && \
     echo "variables_order = \"EGPCS\""  >> ${php_vars} && \
     echo "memory_limit = 128M"  >> ${php_vars} && \
     sed -i \
@@ -160,44 +217,34 @@ RUN echo "cgi.fix_pathinfo=0" > ${php_vars} &&\
         -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 8/g" \
         -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 32/g" \
         -e "s/;pm.max_requests = 500/pm.max_requests = 800/g" \
-        -e "s/user = www-data/user = nginx/g" \
-        -e "s/group = www-data/group = nginx/g" \
+        -e "s/;listen.owner = www-data/listen.owner = abc/g" \
+        -e "s/;listen.group = www-data/listen.group = abc/g" \
+        -e "s/user = www-data/user = abc/g" \
+        -e "s/group = www-data/group = abc/g" \
         -e "s/;listen.mode = 0660/listen.mode = 0666/g" \
-        -e "s/;listen.owner = www-data/listen.owner = nginx/g" \
-        -e "s/;listen.group = www-data/listen.group = nginx/g" \
         -e "s/listen = 127.0.0.1:9000/listen = \/var\/run\/php-fpm.sock/g" \
         -e "s/^;clear_env = no$/clear_env = no/" \
+        -e "s/;php_admin_value\[error_log\] = \/var\/log\/fpm-php.www.log/php_admin_value\[error_log\] = \/var\/log\/php\/error.log/g" \
         ${fpm_conf} \
-    && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-    # && sed -i 's/session.save_handler = files/session.save_handler = redis\nsession.save_path = "tcp:\/\/redis:6379"/g' /usr/local/etc/php/php.ini
-
-RUN curl http://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
-    && apk add --no-cache libstdc++ mysql-client bash bash-completion shadow linux-headers \
-        supervisor git zip unzip coreutils libpng libmemcached-libs icu-libs \
-        icu c-client libzip imap postgresql-client postgresql-libs libcap tzdata sqlite \
-        lua-resty-core nginx-mod-http-lua \
-    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    && set -xe \
-    && apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS \
-    && apk add --no-cache --update --virtual .all-deps $PHP_MODULE_DEPS \
-    && docker-php-ext-install sockets gd bcmath intl soap mysqli pdo pdo_mysql pgsql pdo_pgsql zip imap dom opcache \
-    && printf "\n\n\n\n" | pecl install -o -f redis \
-    && docker-php-ext-enable redis \
-    && docker-php-ext-enable sockets \
-    && pecl install msgpack && docker-php-ext-enable msgpack \
-    && pecl install swoole && docker-php-ext-enable swoole \
-    && pecl install igbinary && docker-php-ext-enable igbinary \
-    && printf "\n\n\n\n\n\n\n\n\n\n" | pecl install memcached \
-    && docker-php-ext-enable memcached \
-    && rm -rf /tmp/pear \
-    && apk del .all-deps .phpize-deps \
-    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/* \
-    && rm -f /etc/nginx/conf.d/default.conf.apk-new && rm -f /etc/nginx/nginx.conf.apk-new \
+    && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
+    # && sed -i 's/session.save_handler = files/session.save_handler = redis\nsession.save_path = "tcp:\/\/redis:6379"/g' /usr/local/etc/php/php.ini \
+    && groupmod -g 1000 users \
+    && useradd -u 911 -U -d /home/user -s /bin/false abc \
+    && usermod -G users abc \
+    &&  mkdir -p \
+        /home/user \
     && set -ex \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     && setcap 'cap_net_bind_service=+ep' /usr/local/bin/php \
     && mkdir -p /var/log/supervisor \
-    && chmod +x /start.sh
+#    # forward request and error logs to docker log collector
+#    && ln -sf /dev/stdout /var/log/nginx/access.log \
+#    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && chmod +x /start.sh \
+    && chmod +x /usr/bin/lsiown
 
 EXPOSE 443 80
+
+HEALTHCHECK CMD wget -q --no-cache --spider localhost
 
 CMD ["/start.sh"]

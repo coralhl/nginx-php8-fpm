@@ -52,6 +52,7 @@ msgpack
 mysqli
 mysqlnd
 openssl
+pcntl
 pcre
 PDO
 pdo_mysql

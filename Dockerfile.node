@@ -13,7 +13,7 @@ WORKDIR /var/www/html
 COPY --from=nodejs /opt /opt
 COPY --from=nodejs /usr/local /usr/local
 
-COPY start.node.sh /start.sh
+RUN npm install -g svgo
 
 EXPOSE 443 80
 
