@@ -1,0 +1,12 @@
+steps:
+  build:
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: dockerhub_username
+      password:
+        from_secret: dockerhub_password
+      repo: coralhl/nginx-php8-fpm
+      tags:
+      - latest
+      - php8.2.13
