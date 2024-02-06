@@ -61,7 +61,7 @@ if [ -f /etc/nginx/conf.d/default-ssl.conf ]; then
 fi
 
 ### Set the desired timezone
-if [ ! -z "" ]; then
+if [ ! -z "$TZ" ]; then
   echo "date.timezone="$TZ > /usr/local/etc/php/conf.d/timezone.ini
   rm -f /etc/localtime && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 fi
