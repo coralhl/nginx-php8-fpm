@@ -1,16 +1,16 @@
 # Nginx + php-fpm (v8) + nodejs
 
-Based on php:8.2.7-fpm-alpine3.18, node:20.3.1-alpine3.18 (nodejs is not included in most of other nginx-php images...but needed by a lot of php frameworks), with nginx:alpine and richarvey/nginx-php-fpm's Docker script
+Based on php:8.2.16-fpm-alpine3.19, node:20.3.1-alpine3.18 (nodejs is not included in most of other nginx-php images...but needed by a lot of php frameworks), with nginx:alpine and richarvey/nginx-php-fpm's Docker script
 
 **Tags:**
-* nginx-php8-fpm: latest, php8.2.7 (2023-06-23 alpine3.18)
-* nginx-php8-fpm-node: latest, php8.2.7 (2023-06-23 alpine3.18)
+* nginx-php8-fpm: latest, php8.2.16 (2024-02-21 alpine3.19)
+* nginx-php8-fpm-node: latest, php8.2.16 (2024-02-21 alpine3.19)
 
 **NOTE** If you are upgrading from PHP **8.0 to 8.1** or from **8.1 to 8.2**, you may need to run `composer update` to upgrade php packages, because some packages under 8.0/8.1 are not supported in 8.1/8.2
 
 ```
 # php -v
-PHP 8.2.7 (cli) (built: Jun 15 2023 01:00:47) (NTS)
+PHP 8.2.16 (cli) (built: Jun 15 2023 01:00:47) (NTS)
 Copyright (c) The PHP Group
 Zend Engine v4.2.7, Copyright (c) Zend Technologies
     with Zend OPcache v8.2.7, Copyright (c), by Zend Technologies

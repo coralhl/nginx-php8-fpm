@@ -1,4 +1,4 @@
-FROM php:8.2.13-fpm-alpine3.19
+FROM php:8.2.16-fpm-alpine3.19
 
 LABEL org.opencontainers.image.authors="coral (coralhl@gmail.com)"
 LABEL org.opencontainers.image.url="https://www.github.com/coralhl/nginx-php8-fpm"
@@ -118,6 +118,7 @@ RUN curl http://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --fil
         icu \
         icu-libs \
         icu-data-full \
+        imagemagick \
         imap \
         libmemcached-libs \
         libcap \
@@ -147,6 +148,7 @@ ENV PHP_MODULE_DEPS \
         freetype-dev \
         gcc \
         icu-dev \
+        imagemagick-dev \
         imap-dev \
         jpeg-dev \
         libc-dev \
@@ -182,6 +184,7 @@ RUN set -xe \
         soap \
         sockets \
         zip \
+    && pecl install imagick && docker-php-ext-enable imagick \
     && pecl install igbinary && docker-php-ext-enable igbinary \
     && pecl install memcache && docker-php-ext-enable memcache \
     && pecl install memcached && docker-php-ext-enable memcached \

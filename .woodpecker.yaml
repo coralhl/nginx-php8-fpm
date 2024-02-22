@@ -9,4 +9,4 @@ steps:
       repo: coralhl/nginx-php8-fpm
       tags:
       - latest
-      - php8.2.13
+      - php8.2.16
