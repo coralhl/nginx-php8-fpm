@@ -13,6 +13,7 @@ steps:
         from_secret: m3_access_key_id
       aws_secret_access_key:
         from_secret: m3_secret_access_key
+      aws_region: minio
       dockerfile: Dockerfile.node
       cache_to: type=s3,endpoint_url=m3.xciii.ru,region=minio,bucket=builder-cache,mode=max,compression=zstd
       cache_from: type=s3,endpoint_url=m3.xciii.ru,region=minio,bucket=builder-cache
