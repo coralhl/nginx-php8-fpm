@@ -9,9 +9,9 @@ steps:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      access_key_id:
+      aws_access_key_id:
         from_secret: m3_access_key_id
-      secret_access_key:
+      aws_secret_access_key:
         from_secret: m3_secret_access_key
       dockerfile: Dockerfile.node
       cache_to: type=s3,endpoint_url=m3.xciii.ru,region=minio,bucket=builder-cache,mode=max,compression=zstd
