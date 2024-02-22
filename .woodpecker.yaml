@@ -9,14 +9,7 @@ steps:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      aws_access_key_id:
-        from_secret: m3_access_key_id
-      aws_secret_access_key:
-        from_secret: m3_secret_access_key
-      aws_region: minio
       dockerfile: Dockerfile.node
-      cache_to: type=s3,endpoint_url=m3.xciii.ru,region=minio,bucket=builder-cache,mode=max,compression=zstd
-      cache_from: type=s3,endpoint_url=m3.xciii.ru,region=minio,bucket=builder-cache
       tags:
       - latest
       - php8.2.16
@@ -31,8 +24,6 @@ steps:
       password:
         from_secret: dockerhub_password
       dockerfile: Dockerfile
-      cache_to: type=local,dest=/builder-cache,mode=max,compression=zstd
-      cache_from: type=local,src=/builder-cache
       tags:
       - latest
       - php8.2.16
