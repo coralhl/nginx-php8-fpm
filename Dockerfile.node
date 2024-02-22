@@ -1,6 +1,6 @@
 FROM node:20.11-alpine3.19 AS nodejs
 
-FROM ghcr.io/coralhl/nginx-php8-fpm:php8.2.16
+FROM coralhl/nginx-php8-fpm:php8.2.16
 
 LABEL org.opencontainers.image.authors="coral (coralhl@gmail.com)"
 LABEL org.opencontainers.image.url="https://www.github.com/coralhl/nginx-php8-fpm"
