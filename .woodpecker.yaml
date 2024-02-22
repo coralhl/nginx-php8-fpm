@@ -1,12 +1,29 @@
 steps:
-  build:
-    image: plugins/docker
+  build-php:
+    image: woodpeckerci/plugin-docker-buildx
     settings:
+      platforms: linux/amd64
+      repo: coralhl/nginx-php8-fpm
+      registry: https://index.docker.io/v1/
       username:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      repo: coralhl/nginx-php8-fpm
+      dockerfile: Dockerfile
+      tags:
+      - latest
+      - php8.2.16
+  build-node:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      platforms: linux/amd64
+      repo: coralhl/nginx-php8-fpm-node
+      registry: https://index.docker.io/v1/
+      username:
+        from_secret: dockerhub_username
+      password:
+        from_secret: dockerhub_password
+      dockerfile: Dockerfile.node
       tags:
       - latest
       - php8.2.16

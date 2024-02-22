@@ -16,10 +16,10 @@ Zend Engine v4.2.7, Copyright (c) Zend Technologies
     with Zend OPcache v8.2.7, Copyright (c), by Zend Technologies
 
 # node -v
-v20.3.1
+v20.11
 
 # nginx -v
-nginx version: nginx/1.25.1
+nginx version: nginx/1.25.3
 ```
 
 ## PHP Modules
@@ -43,6 +43,7 @@ hash
 iconv
 igbinary
 imap
+imagick
 intl
 json
 libxml
